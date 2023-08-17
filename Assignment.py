@@ -1,8 +1,9 @@
-pip install streamlit
 import streamlit as st
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+from io import BytesIO
+import base64
 
 def generate_normal_distribution(mean, std_dev, num_samples):
     return np.random.normal(mean, std_dev, num_samples)
@@ -38,16 +39,16 @@ def main():
         st.dataframe(pd.DataFrame(data, columns=['Value']))
 
         st.markdown("### Histogram")
-        st.pyplot()
+        plot_histogram(data)
 
-        st.markdown("### Download CSV")
-        st.download_button(
-            label="Download Generated Data (CSV)",
-            data=csv_string,
-            file_name="generated_data.csv",
-            key="download-btn"
-        )
+        # Create a link to download the CSV file
+        csv_download_link = create_download_link(csv_string, "generated_data.csv")
+        st.markdown(csv_download_link, unsafe_allow_html=True)
+
+def create_download_link(data, filename):
+    csv = data.encode()
+    b64 = base64.b64encode(csv).decode()
+    return f'<a href="data:file/csv;base64,{b64}" download="{filename}">Download CSV</a>'
 
 if __name__ == "__main__":
     main()
-
